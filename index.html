@@ -14,8 +14,14 @@
 
   <div class="controls">
     <input type="text" id="taskInput" placeholder="Enter a task" />
+    <input type="date" id="taskDate" />
     <button onclick="addTask()">Add Task</button>
   </div>
+
+  <section class="task-section">
+    <h2>📋 All Tasks</h2>
+    <ul id="allTasksList" class="task-list"></ul>
+  </section>
 
   <section class="task-section">
     <h2>❌ Incomplete</h2>
@@ -30,7 +36,4 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
 
