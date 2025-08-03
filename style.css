@@ -1,162 +1,17 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+.task-date {
+  margin-left: 8px;
+  font-size: 14px;
+  color: #777;
 }
 
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f9f9f9;
-  color: #333;
-  padding: 40px 5%;
-  max-width: 1000px;
-  margin: auto;
-  font-size: 18px;
-  line-height: 1.6;
-  transition: background-color 0.3s, color 0.3s;
+body.dark-mode .task-date {
+  color: #bbb;
 }
 
-h1 {
-  font-size: 40px;
-  margin-bottom: 20px;
-  text-align: center;
+.controls input[type="date"] {
+  flex: 0.5;
+  min-width: 140px;
 }
 
-h2 {
-  margin-top: 40px;
-  font-size: 28px;
-  color: inherit;
-}
 
-#darkModeToggle {
-  margin: 15px auto;
-  display: block;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.controls {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 30px;
-  flex-wrap: wrap;
-}
-
-.controls input,
-.controls button {
-  padding: 14px;
-  font-size: 18px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  flex: 1;
-  min-width: 180px;
-}
-
-.controls button {
-  background-color: #4caf50;
-  color: white;
-  cursor: pointer;
-  border: none;
-  transition: background-color 0.3s ease;
-}
-
-.controls button:hover {
-  background-color: #45a049;
-}
-
-.task-list {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  background-color: #fff;
-  padding: 16px;
-  margin-bottom: 12px;
-  border-radius: 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-}
-
-.task-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex: 1;
-}
-
-.task-text {
-  font-size: 20px;
-}
-
-.task-buttons {
-  display: flex;
-  gap: 10px;
-}
-
-.task-buttons button {
-  padding: 8px 14px;
-  font-size: 16px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.task-buttons .edit {
-  background-color: #2196f3;
-  color: white;
-}
-
-.task-buttons .delete {
-  background-color: #f44336;
-  color: white;
-}
-
-/* Dark mode styles */
-body.dark-mode {
-  background-color: #121212;
-  color: #e0e0e0;
-}
-
-body.dark-mode li {
-  background-color: #1e1e1e;
-  color: #e0e0e0;
-}
-
-body.dark-mode .controls input {
-  background-color: #2a2a2a;
-  color: #e0e0e0;
-  border: 1px solid #555;
-}
-
-body.dark-mode .controls button {
-  background-color: #388e3c;
-}
-
-body.dark-mode .task-buttons .edit {
-  background-color: #1976d2;
-}
-
-body.dark-mode .task-buttons .delete {
-  background-color: #d32f2f;
-}
-
-@media (max-width: 600px) {
-  h1 {
-    font-size: 30px;
-  }
-
-  .controls input,
-  .controls button {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .task-text {
-    font-size: 18px;
-  }
-}
 
