@@ -1,0 +1,17 @@
+body { font-family: Arial, sans-serif; padding: 20px; max-width: 700px; margin: auto; background: #fff; color: #000; transition: .3s; }
+body.dark-mode { background: #121212; color: #fff; }
+.controls input, .controls select, .controls button { margin: 5px; padding: 8px; }
+.filter-search { margin: 10px 0; }
+.filter-search button { padding: 6px 12px; margin-right: 5px; }
+.filter-search input { padding: 6px; margin-left: 10px; width: 200px; }
+
+li { background: #f0f0f0; color: inherit; margin: 6px 0; padding: 10px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: space-between; cursor: grab; }
+body.dark-mode li { background: #2c2c2c; border-color: #444; }
+li .info { flex: 1; display: flex; flex-direction: column; }
+li .info span { margin-bottom: 4px; }
+.completed .info span.task-text { text-decoration: line-through; opacity: 0.6; }
+
+.tag { font-size: 0.85em; padding: 2px 6px; background: #ddd; border-radius: 4px; margin-left: 6px; }
+body.dark-mode .tag { background: #555; color: #fff; }
+
+button.edit-btn { margin-left: 10px; }
