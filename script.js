@@ -1,155 +1,444 @@
-// Task array as single source of truth
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let tasks = [];
+let walletConnected = false;
+let userAddress = "";
+let provider, signer, contract;
 
-const taskInput = document.getElementById("taskInput");
-const dateInput = document.getElementById("taskDate");
+const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
+const CONTRACT_ABI = [
+  [
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			}
+		],
+		"name": "addTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "deleteTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "newText",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "newDate",
+				"type": "string"
+			}
+		],
+		"name": "editTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "text",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "date",
+				"type": "string"
+			}
+		],
+		"name": "TaskAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "TaskDeleted",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "newText",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "newDate",
+				"type": "string"
+			}
+		],
+		"name": "TaskEdited",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "bool",
+				"name": "completed",
+				"type": "bool"
+			}
+		],
+		"name": "TaskToggled",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "index",
+				"type": "uint256"
+			}
+		],
+		"name": "toggleTask",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "user",
+				"type": "address"
+			}
+		],
+		"name": "getTasks",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "text",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "date",
+						"type": "string"
+					},
+					{
+						"internalType": "bool",
+						"name": "completed",
+						"type": "bool"
+					},
+					{
+						"internalType": "bool",
+						"name": "deleted",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct TodoBase.Task[]",
+				"name": "",
+				"type": "tuple[]"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
+];
 
-const allList = document.getElementById("allTasksList");
-const incompleteList = document.getElementById("incompleteList");
-const completedList = document.getElementById("completedList");
+// Switch to Base mainnet (chainId 0xa = 10 decimal)
+async function switchToBase() {
+  if (!window.ethereum) {
+    alert("MetaMask or compatible wallet not detected!");
+    return false;
+  }
 
-// Add a new task
-function addTask() {
-  const text = taskInput.value.trim();
-  const date = dateInput.value;
-  if (!text) return;
+  const baseChainId = "0xa"; // Base mainnet chain ID
 
-  const newTask = {
-    id: Date.now(),
-    text,
-    date,
-    completed: false
-  };
-
-  tasks.push(newTask);
-  saveTasks();
-  renderTasks();
-
-  taskInput.value = "";
-  dateInput.value = "";
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: baseChainId }],
+    });
+    return true;
+  } catch (switchError) {
+    if (switchError.code === 4902) {
+      // Base network not added in wallet, add it
+      try {
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [{
+            chainId: baseChainId,
+            chainName: "Base Mainnet",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: ["https://mainnet.base.org"],
+            blockExplorerUrls: ["https://basescan.org"]
+          }],
+        });
+        return true;
+      } catch (addError) {
+        console.error("Failed to add Base network", addError);
+        alert("Failed to add Base network to your wallet.");
+        return false;
+      }
+    }
+    console.error("Failed to switch to Base network", switchError);
+    alert("Please switch to Base network manually.");
+    return false;
+  }
 }
 
-// Render all lists
-function renderTasks() {
-  // Clear existing lists
-  allList.innerHTML = "";
-  incompleteList.innerHTML = "";
-  completedList.innerHTML = "";
+window.addEventListener('DOMContentLoaded', () => {
+  const connectBtn = document.getElementById("connectWallet");
+  connectBtn.addEventListener("click", async () => {
+    const switched = await switchToBase();
+    if (!switched) return;
 
-  tasks.forEach(task => {
-    const li = createTaskElement(task);
-
-    // Add to "All Tasks" (clone for display)
-    const allLi = createTaskElement(task, true); // display-only
-    allList.appendChild(allLi);
-
-    // Add to appropriate list
-    if (task.completed) {
-      completedList.appendChild(li);
+    if (typeof window.ethereum !== "undefined") {
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      try {
+        await provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        document.getElementById("walletAddress").innerText = `Connected: ${userAddress}`;
+        walletConnected = true;
+        contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
+        await loadTasksFromBase();
+      } catch (error) {
+        console.error("User rejected wallet connection", error);
+        alert("Wallet connection was rejected.");
+      }
     } else {
-      incompleteList.appendChild(li);
+      alert("No wallet found! Please install MetaMask or Coinbase Wallet.");
     }
   });
+
+  loadTasks(); // Load local tasks if wallet not connected
+});
+
+async function loadTasksFromBase() {
+  if (!walletConnected || !contract) return;
+  try {
+    const chainTasks = await contract.getTasks(userAddress);
+    tasks = chainTasks.map(t => ({
+      text: t.text,
+      date: t.date,
+      completed: t.completed
+    }));
+    renderTasks();
+  } catch (error) {
+    console.error("Error loading tasks from blockchain:", error);
+  }
 }
 
-// Create a task element
-function createTaskElement(task, displayOnly = false) {
-  const li = document.createElement("li");
+function saveTasks() {
+  if (walletConnected) {
+    console.log("Saving tasks on Base requires smart contract transactions per action.");
+  } else {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+}
 
-  const taskLeft = document.createElement("div");
-  taskLeft.className = "task-left";
+function loadTasks() {
+  if (!walletConnected) {
+    tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    renderTasks();
+  }
+}
 
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.checked = task.completed;
-  if (!displayOnly) {
-    checkbox.addEventListener("change", () => toggleTask(task.id));
+async function addTask() {
+  const text = document.getElementById("taskInput").value.trim();
+  const date = document.getElementById("taskDate").value;
+  if (!text) return;
+
+  if (walletConnected && contract) {
+    try {
+      const tx = await contract.addTask(text, date);
+      await tx.wait();
+      await loadTasksFromBase();
+    } catch (error) {
+      console.error("Failed to add task on blockchain:", error);
+      alert("Failed to add task. Check console.");
+    }
+  } else {
+    tasks.push({ text, date, completed: false });
+    saveTasks();
+    renderTasks();
   }
 
-  const span = document.createElement("span");
-  span.className = "task-text";
-  span.textContent = task.text;
-
-  const dateSpan = document.createElement("span");
-  dateSpan.className = "task-date";
-  dateSpan.textContent = task.date ? ` (Due: ${task.date})` : "";
-
-  taskLeft.appendChild(checkbox);
-  taskLeft.appendChild(span);
-  taskLeft.appendChild(dateSpan);
-
-  li.appendChild(taskLeft);
-
-  if (!displayOnly) {
-    const btns = document.createElement("div");
-    btns.className = "task-buttons";
-
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.className = "edit";
-    editBtn.addEventListener("click", () => editTask(task.id));
-
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete";
-    deleteBtn.className = "delete";
-    deleteBtn.addEventListener("click", () => deleteTask(task.id));
-
-    btns.appendChild(editBtn);
-    btns.appendChild(deleteBtn);
-    li.appendChild(btns);
-  }
-
-  return li;
+  document.getElementById("taskInput").value = "";
+  document.getElementById("taskDate").value = "";
 }
 
-// Toggle task completion
-function toggleTask(id) {
-  tasks = tasks.map(task =>
-    task.id === id ? { ...task, completed: !task.completed } : task
-  );
-  saveTasks();
-  renderTasks();
-}
-
-// Edit task
-function editTask(id) {
-  const task = tasks.find(t => t.id === id);
-  const newText = prompt("Edit task:", task.text);
-  if (newText) {
-    task.text = newText.trim();
+async function toggleTask(index) {
+  if (walletConnected && contract) {
+    try {
+      const tx = await contract.toggleTask(index);
+      await tx.wait();
+      await loadTasksFromBase();
+    } catch (error) {
+      console.error("Failed to toggle task:", error);
+      alert("Failed to toggle task. Check console.");
+    }
+  } else {
+    tasks[index].completed = !tasks[index].completed;
     saveTasks();
     renderTasks();
   }
 }
 
-// Delete task
-function deleteTask(id) {
-  tasks = tasks.filter(t => t.id !== id);
-  saveTasks();
-  renderTasks();
+async function deleteTask(index) {
+  if (walletConnected && contract) {
+    try {
+      const tx = await contract.deleteTask(index);
+      await tx.wait();
+      await loadTasksFromBase();
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      alert("Failed to delete task. Check console.");
+    }
+  } else {
+    tasks.splice(index, 1);
+    saveTasks();
+    renderTasks();
+  }
 }
 
-// Save tasks to localStorage
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
+function renderTasks() {
+  const allList = document.getElementById("allTasksList");
+  const incompleteList = document.getElementById("incompleteList");
+  const completedList = document.getElementById("completedList");
+
+  allList.innerHTML = "";
+  incompleteList.innerHTML = "";
+  completedList.innerHTML = "";
+
+  tasks.forEach((task, index) => {
+    const li = document.createElement("li");
+
+    const left = document.createElement("div");
+    left.className = "task-left";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = task.completed;
+    checkbox.addEventListener("change", () => toggleTask(index));
+
+    const text = document.createElement("span");
+    text.className = "task-text";
+    text.textContent = task.text;
+
+    const dateSpan = document.createElement("span");
+    dateSpan.className = "task-date";
+    dateSpan.textContent = task.date ? ` (Due: ${task.date})` : "";
+
+    left.appendChild(checkbox);
+    left.appendChild(text);
+    left.appendChild(dateSpan);
+
+    const buttons = document.createElement("div");
+    buttons.className = "task-buttons";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.className = "delete";
+    deleteBtn.addEventListener("click", () => deleteTask(index));
+
+    buttons.appendChild(deleteBtn);
+
+    li.appendChild(left);
+    li.appendChild(buttons);
+
+    allList.appendChild(li.cloneNode(true));
+    if (task.completed) completedList.appendChild(li.cloneNode(true));
+    else incompleteList.appendChild(li.cloneNode(true));
+  });
 }
 
-// Initial render
-renderTasks();
-
-// -------------------- DARK MODE --------------------
+// Dark mode toggle
 const toggle = document.getElementById('darkModeToggle');
 const body = document.body;
-
-if (localStorage.getItem('theme') === 'dark') {
-  body.classList.add('dark-mode');
-}
+if (localStorage.getItem('theme') === 'dark') body.classList.add('dark-mode');
 
 toggle.addEventListener('click', () => {
   body.classList.toggle('dark-mode');
   const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
   localStorage.setItem('theme', theme);
 });
-
-
-
