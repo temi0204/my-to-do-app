@@ -2,23 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>My To-Do App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My To-Do App - Base & Web2</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
 
     <h1>My To-Do List</h1>
+
     <button id="darkModeToggle">🌙 Toggle Dark Mode</button>
+    <button id="connectWallet">🔗 Connect Wallet</button>
+    <p id="walletAddress"></p>
 
     <div class="controls">
+      <label for="taskInput">Task:</label>
       <input type="text" id="taskInput" placeholder="Enter a task" />
+
+      <label for="taskDate">Due Date:</label>
       <input type="date" id="taskDate" />
-      <button onclick="addTask()">Add Task</button>
+
+      <button id="addTaskBtn">Add Task</button>
     </div>
 
-    <!-- Task Sections (all stacked under heading) -->
     <section class="task-section">
       <h2>📋 All Tasks</h2>
       <ul id="allTasksList" class="task-list"></ul>
@@ -35,9 +41,21 @@
     </section>
 
   </div>
+
+  <!-- Ethers.js library -->
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <!-- Your app script -->
   <script src="script.js"></script>
 </body>
 </html>
+
+
+
+
+
+
+
+
 
 
 
