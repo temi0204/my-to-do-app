@@ -1,0 +1,20 @@
+{
+  "accountAssociation": {
+    "signature": "REPLACE_WITH_GENERATED_SIGNATURE",
+    "key": "REPLACE_WITH_GENERATED_KEY"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Plan Tracker",
+    "homeUrl": "https://my-to-do-app-eta.vercel.app",
+    "iconUrl": "https://placehold.co/200x200.png",
+    "splashImageUrl": "https://placehold.co/800x600.png",
+    "splashBackgroundColor": "#ffffff",
+    "description": "An app where you can make a plan on what you want to do and get reminders.",
+    "ogTitle": "Plan Tracker",
+    "ogDescription": "Make plans and get reminders inside Base App.",
+    "ogImageUrl": "https://placehold.co/1200x800.png",
+    "primaryCategory": "productivity",
+    "tags": ["miniapp", "to-do", "planning"]
+  }
+}
