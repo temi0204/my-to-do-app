@@ -449,3 +449,27 @@ toggle.addEventListener('click', () => {
   localStorage.setItem('theme', theme);
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const statusEl = document.createElement("div");
+  statusEl.style.position = "fixed";
+  statusEl.style.bottom = "10px";
+  statusEl.style.right = "10px";
+  statusEl.style.background = "#4caf50";
+  statusEl.style.color = "white";
+  statusEl.style.padding = "8px 12px";
+  statusEl.style.borderRadius = "6px";
+  statusEl.style.fontFamily = "sans-serif";
+  document.body.appendChild(statusEl);
+
+  if (window.MiniKit && window.MiniKit.MiniApp) {
+    const miniApp = new window.MiniKit.MiniApp();
+    miniApp.onReady(() => {
+      statusEl.textContent = "✅ Running in Base";
+    });
+  } else {
+    statusEl.textContent = "🌐 Normal browser mode";
+  }
+});
+
+
+
