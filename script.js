@@ -1,3 +1,9 @@
+document.addEventListener("DOMContentLoaded", () => {
+  const miniApp = new window.MiniKit.MiniApp();
+  miniApp.onReady(() => {
+    console.log("✅ MiniApp is running inside Base!");
+  });
+});
 let tasks = [];
 let walletConnected = false;
 let userAddress = "";
@@ -442,3 +448,4 @@ toggle.addEventListener('click', () => {
   const theme = body.classList.contains('dark-mode') ? 'dark' : 'light';
   localStorage.setItem('theme', theme);
 });
+
