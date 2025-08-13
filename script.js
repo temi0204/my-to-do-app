@@ -209,14 +209,26 @@ document.addEventListener("DOMContentLoaded", () => {
       deleteBtn.addEventListener("click", () => deleteTask(index));
 
       buttons.appendChild(deleteBtn);
-
       li.append(left, buttons);
-      allList.appendChild(li.cloneNode(true));
-      (task.completed ? completedList : incompleteList).appendChild(li.cloneNode(true));
+
+      // Append original li to all tasks
+      allList.appendChild(li);
+
+      // Clone and reattach delete handler
+      const liClone = li.cloneNode(true);
+      liClone.querySelector(".delete").addEventListener("click", () => deleteTask(index));
+      liClone.querySelector("input[type=checkbox]").addEventListener("change", () => toggleTask(index));
+
+      if (task.completed) {
+        completedList.appendChild(liClone);
+      } else {
+        incompleteList.appendChild(liClone);
+      }
     });
   }
 
   // Load local tasks initially
   loadTasks();
 });
+
 
