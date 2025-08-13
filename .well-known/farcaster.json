@@ -1,7 +1,11 @@
 {
   "accountAssociation": {
-    "signature": "REPLACE_WITH_GENERATED_SIGNATURE",
-    "key": "REPLACE_WITH_GENERATED_KEY"
+     "header": "eyJmaWQiOjExODA4ODAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg1ODdhMzgwMjRDREVCQjdENmM4MEUyNzQ1Mjk2RkEyMjBEODNiYzRDIn0",
+    "payload": "eyJkb21haW4iOiJteS10by1kby1hcHAtZXRhLnZlcmNlbC5hcHAifQ",
+    "signature": "MHgzMTUxZTNlODRjNTZmYjcxYWJiYTNjYmJjYTY4YzZiNWUwMjNiOWJiZGM1OTkzZGE3ZmYxMDJkYzYwZTU4M2VjNTFkMTRiNDhiMDYyYTRkMjczNGMwOTMzYzY0ZDczNmQ5MDA1ZDJkZmQ0ZjE1NTk5OTI1YmZjZTBiMTY3ZGNjNTFi"
+  }
+}
+
   },
   "miniapp": {
     "version": "1",
