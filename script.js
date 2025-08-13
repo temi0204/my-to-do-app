@@ -174,7 +174,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // FIXED renderTasks so delete button works
   function renderTasks() {
     const allList = document.getElementById("allTasksList");
     const incompleteList = document.getElementById("incompleteList");
@@ -182,20 +181,42 @@ document.addEventListener("DOMContentLoaded", () => {
     allList.innerHTML = incompleteList.innerHTML = completedList.innerHTML = "";
 
     tasks.forEach((task, index) => {
-      function buildTaskElement() {
-        const li = document.createElement("li");
-        const left = document.createElement("div");
-        left.className = "task-left";
+      const li = document.createElement("li");
+      const left = document.createElement("div");
+      left.className = "task-left";
 
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.checked = task.completed;
-        checkbox.addEventListener("change", () => toggleTask(index));
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = task.completed;
+      checkbox.addEventListener("change", () => toggleTask(index));
 
-        const text = document.createElement("span");
-        text.className = "task-text";
-        text.textContent = task.text;
+      const text = document.createElement("span");
+      text.className = "task-text";
+      text.textContent = task.text;
 
-        const dateSpan = document.createElement("span");
-        dateSpan.className = "task-date";
-        dateSpan
+      const dateSpan = document.createElement("span");
+      dateSpan.className = "task-date";
+      dateSpan.textContent = task.date ? ` (Due: ${task.date})` : "";
+
+      left.append(checkbox, text, dateSpan);
+
+      const buttons = document.createElement("div");
+      buttons.className = "task-buttons";
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "Delete";
+      deleteBtn.className = "delete";
+      deleteBtn.addEventListener("click", () => deleteTask(index));
+
+      buttons.appendChild(deleteBtn);
+
+      li.append(left, buttons);
+      allList.appendChild(li.cloneNode(true));
+      (task.completed ? completedList : incompleteList).appendChild(li.cloneNode(true));
+    });
+  }
+
+  // Load local tasks initially
+  loadTasks();
+});
+
