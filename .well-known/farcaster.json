@@ -1,24 +1,30 @@
-{
+ "frame": {
+    "name": "\"Plan Tracker",
+    "version": "1",
+    "iconUrl": "https://my-to-do-app-eta.vercel.app/icon.png",
+    "homeUrl": "https://my-to-do-app-eta.vercel.app",
+    "imageUrl": "https://my-to-do-app-eta.vercel.app/image.png",
+    "buttonTitle": "open mini app",
+    "splashImageUrl": "https://my-to-do-app-eta.vercel.app/splash.png",
+    "splashBackgroundColor": "#6200EA",
+    "webhookUrl": "https://my-to-do-app-eta.vercel.app/api/webhook",
+    "subtitle": "set up your plan",
+    "description": "plan your day to day activity and keep track of it",
+    "primaryCategory": "productivity",
+    "screenshotUrls": [
+      "https://my-to-do-app-eta.vercel.app"
+    ],
+    "tags": [
+      "health and fitness",
+      "productivity",
+      "planning"
+    ],
+    "tagline": "grow",
+    "ogTitle": "Plan tracker"
+  },
   "accountAssociation": {
-     "header": "eyJmaWQiOjExODA4ODAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg1ODdhMzgwMjRDREVCQjdENmM4MEUyNzQ1Mjk2RkEyMjBEODNiYzRDIn0",
+    "header": "eyJmaWQiOjExODA4ODAsInR5cGUiOiJjdXN0b2R5Iiwia2V5IjoiMHg1ODdhMzgwMjRDREVCQjdENmM4MEUyNzQ1Mjk2RkEyMjBEODNiYzRDIn0",
     "payload": "eyJkb21haW4iOiJteS10by1kby1hcHAtZXRhLnZlcmNlbC5hcHAifQ",
     "signature": "MHgzMTUxZTNlODRjNTZmYjcxYWJiYTNjYmJjYTY4YzZiNWUwMjNiOWJiZGM1OTkzZGE3ZmYxMDJkYzYwZTU4M2VjNTFkMTRiNDhiMDYyYTRkMjczNGMwOTMzYzY0ZDczNmQ5MDA1ZDJkZmQ0ZjE1NTk5OTI1YmZjZTBiMTY3ZGNjNTFi"
-  }
-}
-
-  },
-  "miniapp": {
-    "version": "1",
-    "name": "Plan Tracker",
-    "homeUrl": "https://my-to-do-app-eta.vercel.app",
-    "iconUrl": "https://placehold.co/200x200.png",
-    "splashImageUrl": "https://placehold.co/800x600.png",
-    "splashBackgroundColor": "#ffffff",
-    "description": "An app where you can make a plan on what you want to do and get reminders.",
-    "ogTitle": "Plan Tracker",
-    "ogDescription": "Make plans and get reminders inside Base App.",
-    "ogImageUrl": "https://placehold.co/1200x800.png",
-    "primaryCategory": "productivity",
-    "tags": ["miniapp", "to-do", "planning"]
   }
 }
