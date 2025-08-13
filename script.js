@@ -230,5 +230,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Load local tasks initially
   loadTasks();
 });
+document.addEventListener("DOMContentLoaded", async () => {
+  const fc = new Farcaster();
+  await fc.init();
+  console.log("✅ SDK initialized");
+
+  try {
+    const user = await fc.getUser();
+    console.log("👤 User:", user);
+  } catch (err) {
+    console.error("Error getting user:", err);
+  }
+});
+
+
 
 
