@@ -1,4 +1,33 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const statusEl = document.createElement("div");
+  statusEl.style.position = "fixed";
+  statusEl.style.bottom = "10px";
+  statusEl.style.right = "10px";
+  statusEl.style.background = "#4caf50";
+  statusEl.style.color = "white";
+  statusEl.style.padding = "8px 12px";
+  statusEl.style.borderRadius = "6px";
+  statusEl.style.fontFamily = "sans-serif";
+  statusEl.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
+  document.body.appendChild(statusEl);
+
+  const ua = navigator.userAgent.toLowerCase();
+  const isBaseWebView = ua.includes("coinbase") || ua.includes("base");
+
+  if (isBaseWebView) {
+    statusEl.textContent = "✅ Running in Base (Dev Mode)";
+  } else {
+    statusEl.textContent = "🌐 Normal browser mode";
+  }
+
+  // Make it disappear after 5 seconds
+  setTimeout(() => {
+    statusEl.remove();
+  }, 5000);
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
   const miniApp = new window.MiniKit.MiniApp();
   miniApp.onReady(() => {
     console.log("✅ MiniApp is running inside Base!");
@@ -470,6 +499,7 @@ document.addEventListener("DOMContentLoaded", () => {
     statusEl.textContent = "🌐 Normal browser mode";
   }
 });
+
 
 
 
