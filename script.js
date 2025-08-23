@@ -10,8 +10,10 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==============================
   // Simple user counter (localStorage)
   // ==============================
+  let count = parseInt(localStorage.getItem("userCount") || "0");
+
+  // Only count if this browser has never been counted
   if (!localStorage.getItem("isCounted")) {
-      let count = parseInt(localStorage.getItem("userCount") || "0");
       count++;
       localStorage.setItem("userCount", count);
       localStorage.setItem("isCounted", "true");
@@ -20,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Show user count in the UI
   const userCountDisplay = document.getElementById("userCountDisplay");
   if (userCountDisplay) {
-      userCountDisplay.textContent = "Users: " + localStorage.getItem("userCount");
+      userCountDisplay.textContent = "Users: " + count;
   }
 });
 
@@ -259,6 +261,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error getting user:", err);
   }
 });
+
 
 
 
