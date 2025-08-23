@@ -6,6 +6,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
   const CONTRACT_ABI = [ /* your ABI here exactly as before */ ];
+// Count users (local version)
+if (!localStorage.getItem("isCounted")) {
+    let count = parseInt(localStorage.getItem("userCount") || "0");
+    count++;
+    localStorage.setItem("userCount", count);
+    localStorage.setItem("isCounted", "true");
+}
+
+console.log("Total users (local): " + localStorage.getItem("userCount"));
 
   // Status badge
   const statusEl = document.createElement("div");
@@ -242,6 +251,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error getting user:", err);
   }
 });
+
 
 
 
