@@ -6,6 +6,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
   const CONTRACT_ABI = [ /* your ABI here exactly as before */ ];
+// ==============================
+// Simple user counter (localStorage)
+// ==============================
+if (!localStorage.getItem("isCounted")) {
+    let count = parseInt(localStorage.getItem("userCount") || "0");
+    count++;
+    localStorage.setItem("userCount", count);
+    localStorage.setItem("isCounted", "true");
+}
+
+// Show user count in the UI
+const userCountDisplay = document.getElementById("userCountDisplay");
+if (userCountDisplay) {
+    userCountDisplay.textContent = "Users: " + localStorage.getItem("userCount");
+}
 
 console.log("Total users (local): " + localStorage.getItem("userCount"));
 
@@ -244,6 +259,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error getting user:", err);
   }
 });
+
 
 
 
