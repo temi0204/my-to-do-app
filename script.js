@@ -6,25 +6,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
   const CONTRACT_ABI = [ /* your ABI here exactly as before */ ];
-document.addEventListener("DOMContentLoaded", () => {
-  // ==============================
-  // Simple user counter (localStorage)
-  // ==============================
-  let count = parseInt(localStorage.getItem("userCount") || "0");
+// ==============================
+// Global User Counter with CountAPI
+// ==============================
+async function updateUserCount() {
+  try {
+    // Call CountAPI (creates a counter if it doesn't exist yet)
+    const res = await fetch("https://api.countapi.xyz/hit/mytodoapp/users");
+    const data = await res.json();
 
-  // Only count if this browser has never been counted
-  if (!localStorage.getItem("isCounted")) {
-      count++;
-      localStorage.setItem("userCount", count);
-      localStorage.setItem("isCounted", "true");
+    // Update UI
+    const userCountDisplay = document.getElementById("userCountDisplay");
+    if (userCountDisplay) {
+      userCountDisplay.textContent = "Users: " + data.value;
+    }
+  } catch (err) {
+    console.error("Error fetching user count:", err);
   }
+}
 
-  // Show user count in the UI
-  const userCountDisplay = document.getElementById("userCountDisplay");
-  if (userCountDisplay) {
-      userCountDisplay.textContent = "Users: " + count;
-  }
-});
+// Run as soon as page loads
+document.addEventListener("DOMContentLoaded", updateUserCount);
 
   // Status badge
   const statusEl = document.createElement("div");
@@ -261,6 +263,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Error getting user:", err);
   }
 });
+
 
 
 
