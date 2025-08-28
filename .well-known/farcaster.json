@@ -30,8 +30,7 @@
   },
   "baseBuilder": {
     "allowedAddresses": [
-      "0x811eedFB859e320fBA3Cd78f1388531Ad6d0d0bF",
-      "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c"
+      "0x811eedFB859e320fBA3Cd78f38853fAD6Dd00bfF"
     ]
   }
 }
