@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Registered Users (Private)</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: #fff;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      width: 400px;
+      text-align: center;
+    }
+    #userList {
+      text-align: left;
+      margin-top: 20px;
+      display: none;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #6200ea;
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background: #4500b5;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔒 Private Access</h2>
+    <input type="password" id="passkey" placeholder="Enter passkey">
+    <button onclick="unlock()">Unlock</button>
+
+    <div id="userList">
+      <h3>Registered Users</h3>
+      <ul id="users"></ul>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <script>
+    const SECRET_KEY = "admin0204"; // 🔑 change this to your own passkey
+
+    function unlock() {
+      const entered = document.getElementById("passkey").value;
+      if (entered === SECRET_KEY) {
+        document.getElementById("userList").style.display = "block";
+        loadUsers();
+      } else {
+        alert("❌ Wrong passkey");
+      }
+    }
+
+    function logout() {
+      document.getElementById("userList").style.display = "none";
+      document.getElementById("passkey").value = "";
+    }
+
+    function loadUsers() {
+      const list = document.getElementById("users");
+      list.innerHTML = "";
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith("user_")) {
+          const email = key.replace("user_", "");
+          list.innerHTML += `<li>${email}</li>`;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
