@@ -37,22 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   updateUserCount();
 
-  // ---------- small status badge ----------
-  const statusEl = document.createElement("div");
-  statusEl.style.position = "fixed";
-  statusEl.style.bottom = "10px";
-  statusEl.style.right = "10px";
-  statusEl.style.background = "#4caf50";
-  statusEl.style.color = "white";
-  statusEl.style.padding = "8px 12px";
-  statusEl.style.borderRadius = "6px";
-  statusEl.style.fontFamily = "sans-serif";
-  document.body.appendChild(statusEl);
-
-  if (window.MiniKit && window.MiniKit.MiniApp) {
-    statusEl.textContent = "✅ Running in Base";
-  } else {
-    statusEl.textContent = "🌐 Normal browser mode";
+  // ---------- Helper: email validator ----------
+  function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
   }
 
   // ---------- Auth functions ----------
@@ -70,11 +58,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function signup() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
+
     if (!username || !password) {
-      if (authMessage) authMessage.textContent = "Enter username and password!";
-      showPopup("⚠️ Enter username and password!", "#f44336");
+      if (authMessage) authMessage.textContent = "Enter email and password!";
+      showPopup("⚠️ Enter email and password!", "#f44336");
       return;
     }
+
+    if (!isValidEmail(username)) {
+      if (authMessage) authMessage.textContent = "Enter a valid email address!";
+      showPopup("📧 Invalid email format", "#f44336");
+      return;
+    }
+
     if (localStorage.getItem("user_" + username)) {
       if (authMessage) authMessage.textContent = "User already exists.";
       showPopup("❌ User already exists", "#f44336");
@@ -89,6 +85,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function login() {
     const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
+
+    if (!isValidEmail(username)) {
+      if (authMessage) authMessage.textContent = "Enter a valid email address!";
+      showPopup("📧 Invalid email format", "#f44336");
+      return;
+    }
+
     const storedPassword = localStorage.getItem("user_" + username);
     if (storedPassword && storedPassword === password) {
       localStorage.setItem("loggedInUser", username);
@@ -143,6 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ---------- Wallet helpers ----------
   async function switchToBase() { /* ... unchanged ... */ }
+
   async function connectWalletAndLogin() {
     const switched = await switchToBase();
     if (!switched) return;
@@ -166,12 +170,13 @@ document.addEventListener("DOMContentLoaded", () => {
       showPopup("❌ Wallet connection rejected", "#f44336");
     }
   }
+
   window.connectWallet = connectWalletAndLogin;
   if (walletLoginBtn) walletLoginBtn.addEventListener("click", connectWalletAndLogin);
   if (connectWalletBtn) connectWalletBtn.addEventListener("click", connectWalletAndLogin);
 
-  // ---------- Task storage, UI actions, render ----------  
-  // (keep your existing code for tasks exactly the same)
+  // ---------- Task storage, UI actions, render ----------
+  // (keep your existing task code unchanged)
 
   // ---------- initial behavior ----------
   if (localStorage.getItem("loggedInUser")) {
@@ -180,13 +185,5 @@ document.addEventListener("DOMContentLoaded", () => {
     showAuth();
   }
 
-  window.addTask = addTask;
-  window.toggleTask = toggleTask;
-  window.deleteTask = deleteTask;
-
   console.log("script.js initialized");
 });
-
-
-
-
