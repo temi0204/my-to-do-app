@@ -195,52 +195,90 @@ body.dark-mode .task-date {
 /* Auth Page Styles */
 #authSection {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #6200ea, #3700b3);
-  color: white;
-  font-family: "Arial", sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+#authSection .auth-card {
+  background: white;
+  color: #333;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 320px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: fadeIn 0.6s ease-in-out;
 }
 
 #authSection h2 {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   margin-bottom: 1rem;
+  color: #6200ea;
 }
 
 #authSection input {
-  width: 250px;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 6px;
-  border: none;
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   font-size: 1rem;
+  transition: border 0.2s;
+}
+
+#authSection input:focus {
+  border-color: #6200ea;
+  outline: none;
+  box-shadow: 0 0 4px rgba(98, 0, 234, 0.4);
 }
 
 #authSection button {
-  width: 260px;
-  padding: 10px;
-  margin: 6px 0;
-  background: white;
-  color: #6200ea;
-  font-weight: bold;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  background: #6200ea;
+  color: white;
+  font-weight: 600;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background 0.3s, transform 0.1s;
 }
 
 #authSection button:hover {
-  background: #bb86fc;
-  color: white;
+  background: #4b00c9;
+  transform: translateY(-2px);
+}
+
+#authSection button:active {
+  transform: translateY(0);
+}
+
+/* Special style for wallet login */
+#walletLoginBtn {
+  background: #03dac5;
+  color: #222;
+}
+#walletLoginBtn:hover {
+  background: #00bfa5;
 }
 
 #authMessage {
   margin-top: 1rem;
   font-size: 0.9rem;
-  color: yellow;
+  color: #d32f2f;
+  font-weight: bold;
 }
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .popup {
   display: none;
   position: fixed;
@@ -255,6 +293,7 @@ body.dark-mode .task-date {
   box-shadow: 0 2px 10px rgba(0,0,0,0.3);
   z-index: 1000;
 }
+
 
 
 
