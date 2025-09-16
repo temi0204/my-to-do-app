@@ -9,25 +9,24 @@
 </head>
 <body>
   <div id="popup" class="popup">
-  <p id="popupMessage"></p>
-</div>
+    <p id="popupMessage"></p>
+  </div>
 
   <div class="container">
 
     <!-- AUTH PAGE -->
     <div id="authSection">
       <h2>Login / Signup</h2>
-      <input type="text" id="email" placeholder="E-mail">
-      <input type="password" id="password" placeholder="Enter password">
-      <button onclick="signup()">Signup</button>
-      <button onclick="login()">Login</button>
-<!--       <button onclick="connectWallet()">Login with Wallet</button> -->
+      <input type="email" id="username" placeholder="E-mail" required>
+      <input type="password" id="password" placeholder="Enter password" required>
+      <button id="signupBtn">Signup</button>
+      <button id="loginBtn">Login</button>
+      <!-- <button id="walletLoginBtn">Login with Wallet</button> -->
       <p id="authMessage"></p>
     </div>
 
     <!-- APP PAGE (hidden at first) -->
     <div id="appSection" style="display:none;">
-
       <h1>My To-Do List</h1>
 
       <button id="darkModeToggle">🌙 Toggle Dark Mode</button>
@@ -68,10 +67,4 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
 
