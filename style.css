@@ -192,97 +192,56 @@ body.dark-mode .task-date {
     font-size: 18px;
   }
 }
-/* ===========================
-   Full-page Auth Page Styles
-   =========================== */
+/* Auth Page Styles */
 #authSection {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;   /* Full height */
-  width: 100vw;    /* Full width */
-  background: linear-gradient(135deg, #6a11cb, #2575fc); /* smoother gradient */
-  font-family: "Segoe UI", Arial, sans-serif;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #6200ea, #3700b3);
   color: white;
-  overflow: hidden;
+  font-family: "Arial", sans-serif;
 }
 
-/* Auth Card */
-.auth-box {
-  background: rgba(255, 255, 255, 0.12);
-  padding: 2.5rem;
-  border-radius: 14px;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
-  text-align: center;
-  animation: fadeIn 0.6s ease-in-out;
+#authSection h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
 }
 
-.auth-box h2 {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-/* Inputs */
-.auth-box input {
-  width: 100%;
-  padding: 12px;
-  margin: 12px 0;
-  border-radius: 8px;
+#authSection input {
+  width: 250px;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
   border: none;
   font-size: 1rem;
-  outline: none;
-  box-sizing: border-box;
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  transition: background 0.3s;
 }
 
-.auth-box input:focus {
-  background: rgba(255, 255, 255, 0.25);
-  outline: 2px solid #bb86fc;
-}
-
-/* Buttons */
-.auth-box button {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  background: #fff;
+#authSection button {
+  width: 260px;
+  padding: 10px;
+  margin: 6px 0;
+  background: white;
   color: #6200ea;
-  font-weight: 600;
+  font-weight: bold;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: 0.2s;
 }
 
-.auth-box button:hover {
+#authSection button:hover {
   background: #bb86fc;
   color: white;
-  transform: translateY(-2px);
 }
 
-#walletLoginBtn {
-  background: #03dac5;
-  color: #222;
-}
-#walletLoginBtn:hover {
-  background: #00bfa5;
-  color: #fff;
-}
-
-/* Messages */
 #authMessage {
   margin-top: 1rem;
-  font-size: 0.95rem;
-  font-weight: bold;
-  color: #ffeb3b;
+  font-size: 0.9rem;
+  color: yellow;
 }
+
 
 /* ===========================
    Popup (Toast) Message
@@ -318,3 +277,4 @@ body.dark-mode .task-date {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
 }
+
