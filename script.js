@@ -1,84 +1,242 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // ---------- state ----------
   let tasks = [];
   let walletConnected = false;
   let userAddress = "";
   let provider, signer, contract;
 
   const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
-  const CONTRACT_ABI = [ /* your ABI here */ ];
+  const CONTRACT_ABI = [
+    {
+      "inputs": [
+        { "internalType": "string", "name": "text", "type": "string" },
+        { "internalType": "string", "name": "date", "type": "string" }
+      ],
+      "name": "addTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "index", "type": "uint256" }
+      ],
+      "name": "deleteTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "index", "type": "uint256" },
+        { "internalType": "string", "name": "newText", "type": "string" },
+        { "internalType": "string", "name": "newDate", "type": "string" }
+      ],
+      "name": "editTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+        { "indexed": true, "internalType": "uint256", "name": "index", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "text", "type": "string" },
+        { "indexed": false, "internalType": "string", "name": "date", "type": "string" }
+      ],
+      "name": "TaskAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+        { "indexed": true, "internalType": "uint256", "name": "index", "type": "uint256" }
+      ],
+      "name": "TaskDeleted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+        { "indexed": true, "internalType": "uint256", "name": "index", "type": "uint256" },
+        { "indexed": false, "internalType": "string", "name": "newText", "type": "string" },
+        { "indexed": false, "internalType": "string", "name": "newDate", "type": "string" }
+      ],
+      "name": "TaskEdited",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        { "indexed": true, "internalType": "address", "name": "user", "type": "address" },
+        { "indexed": true, "internalType": "uint256", "name": "index", "type": "uint256" },
+        { "indexed": false, "internalType": "bool", "name": "completed", "type": "bool" }
+      ],
+      "name": "TaskToggled",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint256", "name": "index", "type": "uint256" }
+      ],
+      "name": "toggleTask",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "user", "type": "address" }
+      ],
+      "name": "getTasks",
+      "outputs": [
+        {
+          "components": [
+            { "internalType": "string", "name": "text", "type": "string" },
+            { "internalType": "string", "name": "date", "type": "string" },
+            { "internalType": "bool", "name": "completed", "type": "bool" },
+            { "internalType": "bool", "name": "deleted", "type": "bool" }
+          ],
+          "internalType": "struct TodoBase.Task[]",
+          "name": "",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ];
 
-  // ==============================
-  // AUTH HANDLING
-  // ==============================
+  // ---------- DOM refs ----------
+  const authSection = document.getElementById("authSection");
+  const appSection = document.getElementById("appSection");
+  const authMessage = document.getElementById("authMessage");
+
+  const signupBtn = document.getElementById("signupBtn");
+  const loginBtn = document.getElementById("loginBtn");
+  const walletLoginBtn = document.getElementById("walletLoginBtn");
+  const logoutBtn = document.querySelector("#appSection button[onclick='logout()']"); // fallback
+  const connectWalletBtn = document.getElementById("connectWallet");
+  const addTaskBtn = document.getElementById("addTaskBtn");
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  const userCountDisplay = document.getElementById("userCountDisplay");
+
+  // ---------- CountAPI (global users) ----------
+  async function updateUserCount() {
+    try {
+      const res = await fetch("https://api.countapi.xyz/hit/mytodoapp/users");
+      if (!res.ok) throw new Error("countapi fetch failed");
+      const data = await res.json();
+      if (userCountDisplay) userCountDisplay.textContent = "Users: " + data.value;
+      console.log("CountAPI value:", data.value);
+    } catch (err) {
+      console.warn("CountAPI error:", err);
+      if (userCountDisplay) userCountDisplay.textContent = "Users: error";
+    }
+  }
+  // run it
+  updateUserCount();
+
+  // ---------- small status badge ----------
+  const statusEl = document.createElement("div");
+  statusEl.style.position = "fixed";
+  statusEl.style.bottom = "10px";
+  statusEl.style.right = "10px";
+  statusEl.style.background = "#4caf50";
+  statusEl.style.color = "white";
+  statusEl.style.padding = "8px 12px";
+  statusEl.style.borderRadius = "6px";
+  statusEl.style.fontFamily = "sans-serif";
+  document.body.appendChild(statusEl);
+
+  if (window.MiniKit && window.MiniKit.MiniApp) {
+    statusEl.textContent = "✅ Running in Base";
+  } else {
+    statusEl.textContent = "🌐 Normal browser mode";
+  }
+
+  // ---------- Auth functions ----------
   function showApp() {
-    document.getElementById("authSection").style.display = "none";
-    document.getElementById("appSection").style.display = "block";
-    loadTasks();
+    if (authSection) authSection.style.display = "none";
+    if (appSection) appSection.style.display = "block";
+    loadTasks(); // show that user's tasks
+  }
+
+  function showAuth() {
+    if (authSection) authSection.style.display = "block";
+    if (appSection) appSection.style.display = "none";
   }
 
   function signup() {
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
-
     if (!username || !password) {
-      document.getElementById("authMessage").textContent = "Enter username and password!";
+      if (authMessage) authMessage.textContent = "Enter username and password!";
       return;
     }
-
     if (localStorage.getItem("user_" + username)) {
-      document.getElementById("authMessage").textContent = "User already exists.";
+      if (authMessage) authMessage.textContent = "User already exists.";
     } else {
       localStorage.setItem("user_" + username, password);
-      document.getElementById("authMessage").textContent = "Signup successful! Please login.";
+      if (authMessage) authMessage.textContent = "Signup successful! Please login.";
+      console.log("New signup:", username);
     }
   }
 
   function login() {
-    const username = document.getElementById("username").value;
+    const username = document.getElementById("username").value.trim();
     const password = document.getElementById("password").value;
-
     const storedPassword = localStorage.getItem("user_" + username);
     if (storedPassword && storedPassword === password) {
       localStorage.setItem("loggedInUser", username);
-      document.getElementById("authMessage").textContent = "Login successful!";
+      if (authMessage) authMessage.textContent = "Login successful!";
+      console.log("Login:", username);
+      // track login globally
+      fetch(`https://api.countapi.xyz/hit/mytodoapp/logins_${encodeURIComponent(username)}`).catch(()=>{});
       showApp();
     } else {
-      document.getElementById("authMessage").textContent = "Invalid credentials.";
+      if (authMessage) authMessage.textContent = "Invalid credentials.";
     }
   }
 
   function logout() {
     localStorage.removeItem("loggedInUser");
-    document.getElementById("authSection").style.display = "block";
-    document.getElementById("appSection").style.display = "none";
-    taskList.innerHTML = "";
+    // if user logged in via wallet, also disconnect visual state
+    document.getElementById("walletAddress").innerText = "";
+    walletConnected = false;
+    userAddress = "";
+    showAuth();
   }
 
-  // Auto-login if user already logged in
-  if (localStorage.getItem("loggedInUser")) {
-    showApp();
+  // Expose functions globally so inline onclick HTML works
+  window.signup = signup;
+  window.login = login;
+  window.logout = logout;
+
+  // attach listeners if elements exist (preferable)
+  if (signupBtn) signupBtn.addEventListener("click", signup);
+  if (loginBtn) loginBtn.addEventListener("click", login);
+  if (logoutBtn) logoutBtn.addEventListener("click", logout);
+
+  // ---------- Dark mode ----------
+  if (darkModeToggle) {
+    if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark-mode");
+    darkModeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+    });
   }
 
-  // ==============================
-  // Dark mode toggle
-  // ==============================
-  const toggle = document.getElementById("darkModeToggle");
-  const body = document.body;
-  if (localStorage.getItem("theme") === "dark") body.classList.add("dark-mode");
-  toggle.addEventListener("click", () => {
-    body.classList.toggle("dark-mode");
-    localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
-  });
-
-  // ==============================
-  // Wallet + Base Connection
-  // ==============================
+  // ---------- Wallet helpers ----------
   async function switchToBase() {
     if (!window.ethereum) {
       alert("Wallet not detected!");
       return false;
     }
-    const baseChainId = "0xa";
+    const baseChainId = "0xa"; // 10 in hex (Base mainnet). If you used testnet change accordingly.
     try {
       await window.ethereum.request({
         method: "wallet_switchEthereumChain",
@@ -107,9 +265,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  document.getElementById("connectWallet").addEventListener("click", async () => {
+  async function connectWalletAndLogin() {
+    // prefer switch to Base first
     const switched = await switchToBase();
-    if (!switched) return;
+    if (!switched) {
+      console.log("User didn't switch to Base or no wallet");
+      return;
+    }
     if (!window.ethereum) return alert("Install MetaMask or Coinbase Wallet.");
     provider = new ethers.providers.Web3Provider(window.ethereum);
     try {
@@ -119,34 +281,29 @@ document.addEventListener("DOMContentLoaded", () => {
       document.getElementById("walletAddress").innerText = `Connected: ${userAddress}`;
       walletConnected = true;
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
-      await loadTasksFromBase();
 
-      // Treat wallet connection as login
+      // treat wallet login as login
       localStorage.setItem("loggedInUser", userAddress);
+      // track login
+      fetch(`https://api.countapi.xyz/hit/mytodoapp/logins_${encodeURIComponent(userAddress)}`).catch(()=>{});
+      // load chain tasks and show app
+      await loadTasksFromBase();
       showApp();
+      console.log("Wallet connected and logged in:", userAddress);
     } catch (e) {
+      console.error("Wallet connection rejected", e);
       alert("Wallet connection rejected.");
-    }
-  });
-
-  // ==============================
-  // Tasks (Local + Base)
-  // ==============================
-  async function loadTasksFromBase() {
-    if (!walletConnected || !contract) return;
-    try {
-      const chainTasks = await contract.getTasks(userAddress);
-      tasks = chainTasks.map(t => ({
-        text: t.text,
-        date: t.date,
-        completed: t.completed
-      }));
-      renderTasks();
-    } catch (e) {
-      console.error(e);
     }
   }
 
+  // Expose wallet function globally (so inline onclick works)
+  window.connectWallet = connectWalletAndLogin;
+  if (walletLoginBtn) walletLoginBtn.addEventListener("click", connectWalletAndLogin);
+
+  // also bind the top-level connectWallet button in appSection (if exists)
+  if (connectWalletBtn) connectWalletBtn.addEventListener("click", connectWalletAndLogin);
+
+  // ---------- Task storage helpers ----------
   function getUserTaskKey() {
     const user = localStorage.getItem("loggedInUser");
     if (!user) return null;
@@ -161,33 +318,62 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadTasks() {
-    if (!walletConnected) {
-      const key = getUserTaskKey();
-      if (key) tasks = JSON.parse(localStorage.getItem(key)) || [];
+    if (walletConnected) {
+      // already loaded by wallet login path
+      return;
+    }
+    const key = getUserTaskKey();
+    if (!key) {
+      // no user logged in — show auth instead
+      if (!localStorage.getItem("loggedInUser")) {
+        showAuth();
+      }
+      tasks = [];
       renderTasks();
+      return;
+    }
+    tasks = JSON.parse(localStorage.getItem(key)) || [];
+    renderTasks();
+  }
+
+  async function loadTasksFromBase() {
+    if (!walletConnected || !contract) return;
+    try {
+      const address = userAddress || await signer.getAddress();
+      const chainTasks = await contract.getTasks(address);
+      tasks = chainTasks.map(t => ({ text: t.text, date: t.date, completed: t.completed }));
+      renderTasks();
+    } catch (e) {
+      console.error("loadTasksFromBase error", e);
     }
   }
 
-  document.getElementById("addTaskBtn").addEventListener("click", addTask);
+  // ---------- Task UI actions ----------
+  if (addTaskBtn) addTaskBtn.addEventListener("click", addTask);
   async function addTask() {
-    const text = document.getElementById("taskInput").value.trim();
-    const date = document.getElementById("taskDate").value;
-    if (!text) return;
+    const textEl = document.getElementById("taskInput");
+    const dateEl = document.getElementById("taskDate");
+    const text = textEl ? textEl.value.trim() : "";
+    const date = dateEl ? dateEl.value : "";
+    if (!text) return alert("Enter a task");
+
     if (walletConnected && contract) {
       try {
         const tx = await contract.addTask(text, date);
         await tx.wait();
         await loadTasksFromBase();
-      } catch {
-        alert("Failed to add task.");
+      } catch (e) {
+        console.error("addTask onchain failed", e);
+        alert("Failed to add task on-chain.");
       }
     } else {
       tasks.push({ text, date, completed: false });
       saveTasks();
       renderTasks();
     }
-    document.getElementById("taskInput").value = "";
-    document.getElementById("taskDate").value = "";
+
+    if (textEl) textEl.value = "";
+    if (dateEl) dateEl.value = "";
   }
 
   async function toggleTask(index) {
@@ -196,8 +382,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const tx = await contract.toggleTask(index);
         await tx.wait();
         await loadTasksFromBase();
-      } catch {
-        alert("Failed to toggle task.");
+      } catch (e) {
+        console.error("toggleTask onchain error", e);
+        alert("Failed to toggle on-chain");
       }
     } else {
       tasks[index].completed = !tasks[index].completed;
@@ -212,8 +399,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const tx = await contract.deleteTask(index);
         await tx.wait();
         await loadTasksFromBase();
-      } catch {
-        alert("Failed to delete task.");
+      } catch (e) {
+        console.error("deleteTask onchain error", e);
+        alert("Failed to delete on-chain");
       }
     } else {
       tasks.splice(index, 1);
@@ -222,10 +410,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // ---------- render ----------
   function renderTasks() {
     const allList = document.getElementById("allTasksList");
     const incompleteList = document.getElementById("incompleteList");
     const completedList = document.getElementById("completedList");
+    if (!allList || !incompleteList || !completedList) return;
+
     allList.innerHTML = incompleteList.innerHTML = completedList.innerHTML = "";
 
     tasks.forEach((task, index) => {
@@ -235,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
-      checkbox.checked = task.completed;
+      checkbox.checked = !!task.completed;
       checkbox.addEventListener("change", () => toggleTask(index));
 
       const text = document.createElement("span");
@@ -259,33 +450,30 @@ document.addEventListener("DOMContentLoaded", () => {
       buttons.appendChild(deleteBtn);
       li.append(left, buttons);
 
-      // Append original li to all tasks
       allList.appendChild(li);
 
-      // Clone and reattach delete handler
       const liClone = li.cloneNode(true);
       liClone.querySelector(".delete").addEventListener("click", () => deleteTask(index));
       liClone.querySelector("input[type=checkbox]").addEventListener("change", () => toggleTask(index));
 
-      if (task.completed) {
-        completedList.appendChild(liClone);
-      } else {
-        incompleteList.appendChild(liClone);
-      }
+      if (task.completed) completedList.appendChild(liClone);
+      else incompleteList.appendChild(liClone);
     });
   }
 
-  // Initial load (local if no wallet)
-  loadTasks();
+  // ---------- initial behavior ----------
+  // If already logged in, show app; otherwise show auth
+  if (localStorage.getItem("loggedInUser")) {
+    // if logged-in user is a wallet address we try to set walletConnected false (wallet connect will run only if user clicks connect)
+    showApp();
+  } else {
+    showAuth();
+  }
+
+  // expose task functions for debugging / inline handlers
+  window.addTask = addTask;
+  window.toggleTask = toggleTask;
+  window.deleteTask = deleteTask;
+
+  console.log("script.js initialized");
 });
-// Expose auth functions globally so HTML buttons can use them
-window.signup = signup;
-window.login = login;
-window.logout = logout;
-window.connectWallet = async function() {
-  document.getElementById("connectWallet").click(); // trigger wallet button
-};
-
-
-      
-
