@@ -241,6 +241,22 @@ body.dark-mode .task-date {
   font-size: 0.9rem;
   color: yellow;
 }
+.popup {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4caf50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+
+
 
 
 
