@@ -5,66 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>My To-Do App - Base & Web2</title>
   <link rel="stylesheet" href="style.css" />
-    <script src="https://unpkg.com/@coinbase/minikit-js@latest/dist/minikit.min.js"></script>
+  <script src="https://unpkg.com/@coinbase/minikit-js@latest/dist/minikit.min.js"></script>
 </head>
 <body>
   <div class="container">
 
-    <h1>My To-Do List</h1>
-<!-- <p id="userCountDisplay">Users: 0</p>  -->
-<!-- <h1>My To-Do App</h1> -->
-<!-- <p id="userCountDisplay">Users: loading...</p> -->
-
-    <button id="darkModeToggle">🌙 Toggle Dark Mode</button>
-    <button id="connectWallet">🔗 Connect Wallet</button>
-    <p id="walletAddress"></p>
-
-    <div class="controls">
-      <label for="taskInput">Task:</label>
-      <input type="text" id="taskInput" placeholder="Enter a task" />
-
-      <label for="taskDate">Due Date:</label>
-      <input type="date" id="taskDate" />
-
-      <button id="addTaskBtn">Add Task</button>
+    <!-- AUTH PAGE -->
+    <div id="authSection">
+      <h2>Login / Signup</h2>
+      <input type="text" id="username" placeholder="Enter username">
+      <input type="password" id="password" placeholder="Enter password">
+      <button onclick="signup()">Signup</button>
+      <button onclick="login()">Login</button>
+      <button onclick="connectWallet()">Login with Wallet</button>
+      <p id="authMessage"></p>
     </div>
 
-    <section class="task-section">
-      <h2>📋 All Tasks</h2>
-      <ul id="allTasksList" class="task-list"></ul>
-    </section>
+    <!-- APP PAGE (hidden at first) -->
+    <div id="appSection" style="display:none;">
 
-    <section class="task-section">
-      <h2>❌ Incomplete</h2>
-      <ul id="incompleteList" class="task-list"></ul>
-    </section>
+      <h1>My To-Do List</h1>
 
-    <section class="task-section">
-      <h2>✅ Completed</h2>
-      <ul id="completedList" class="task-list"></ul>
-    </section>
+      <button id="darkModeToggle">🌙 Toggle Dark Mode</button>
+      <button id="connectWallet">🔗 Connect Wallet</button>
+      <p id="walletAddress"></p>
 
+      <div class="controls">
+        <label for="taskInput">Task:</label>
+        <input type="text" id="taskInput" placeholder="Enter a task" />
+
+        <label for="taskDate">Due Date:</label>
+        <input type="date" id="taskDate" />
+
+        <button id="addTaskBtn">Add Task</button>
+      </div>
+
+      <section class="task-section">
+        <h2>📋 All Tasks</h2>
+        <ul id="allTasksList" class="task-list"></ul>
+      </section>
+
+      <section class="task-section">
+        <h2>❌ Incomplete</h2>
+        <ul id="incompleteList" class="task-list"></ul>
+      </section>
+
+      <section class="task-section">
+        <h2>✅ Completed</h2>
+        <ul id="completedList" class="task-list"></ul>
+      </section>
+
+      <button onclick="logout()">Logout</button>
+    </div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@farcaster/mini-apps-sdk/dist/index.min.js"></script>
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@farcaster/mini-apps-sdk/dist/index.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
