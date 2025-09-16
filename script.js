@@ -278,5 +278,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial load (local if no wallet)
   loadTasks();
 });
+// Expose auth functions globally so HTML buttons can use them
+window.signup = signup;
+window.login = login;
+window.logout = logout;
+window.connectWallet = async function() {
+  document.getElementById("connectWallet").click(); // trigger wallet button
+};
+
 
       
+
