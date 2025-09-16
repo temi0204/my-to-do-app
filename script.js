@@ -5,61 +5,74 @@ document.addEventListener("DOMContentLoaded", () => {
   let provider, signer, contract;
 
   const CONTRACT_ADDRESS = "0x6C45b045591b3daE5842C29FB3B5f41b29Ed8F0c";
-  const CONTRACT_ABI = [ /* your ABI here exactly as before */ ];
-// ==============================
-// Global User Counter with CountAPI
-// ==============================
-async function updateUserCount() {
-  try {
-    // Call CountAPI (creates a counter if it doesn't exist yet)
-    const res = await fetch("https://api.countapi.xyz/hit/mytodoapp/users");
-    const data = await res.json();
+  const CONTRACT_ABI = [ /* your ABI here */ ];
 
-    // Update UI
-    const userCountDisplay = document.getElementById("userCountDisplay");
-    if (userCountDisplay) {
-      userCountDisplay.textContent = "Users: " + data.value;
+  // ==============================
+  // AUTH HANDLING
+  // ==============================
+  function showApp() {
+    document.getElementById("authSection").style.display = "none";
+    document.getElementById("appSection").style.display = "block";
+    loadTasks();
+  }
+
+  function signup() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    if (!username || !password) {
+      document.getElementById("authMessage").textContent = "Enter username and password!";
+      return;
     }
-  } catch (err) {
-    console.error("Error fetching user count:", err);
-  }
-}
 
-// Run as soon as page loads
-document.addEventListener("DOMContentLoaded", updateUserCount);
-
-  // Status badge
-  const statusEl = document.createElement("div");
-  statusEl.style.position = "fixed";
-  statusEl.style.bottom = "10px";
-  statusEl.style.right = "10px";
-  statusEl.style.background = "#4caf50";
-  statusEl.style.color = "white";
-  statusEl.style.padding = "8px 12px";
-  statusEl.style.borderRadius = "6px";
-  statusEl.style.fontFamily = "sans-serif";
-  document.body.appendChild(statusEl);
-
-  if (window.MiniKit && window.MiniKit.MiniApp) {
-    const miniApp = new window.MiniKit.MiniApp();
-    miniApp.onReady(() => {
-      console.log("✅ MiniApp running in Base");
-      statusEl.textContent = "✅ Running in Base";
-    });
-  } else {
-    statusEl.textContent = "🌐 Normal browser mode";
+    if (localStorage.getItem("user_" + username)) {
+      document.getElementById("authMessage").textContent = "User already exists.";
+    } else {
+      localStorage.setItem("user_" + username, password);
+      document.getElementById("authMessage").textContent = "Signup successful! Please login.";
+    }
   }
 
-  // Dark mode
-  const toggle = document.getElementById('darkModeToggle');
+  function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const storedPassword = localStorage.getItem("user_" + username);
+    if (storedPassword && storedPassword === password) {
+      localStorage.setItem("loggedInUser", username);
+      document.getElementById("authMessage").textContent = "Login successful!";
+      showApp();
+    } else {
+      document.getElementById("authMessage").textContent = "Invalid credentials.";
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem("loggedInUser");
+    document.getElementById("authSection").style.display = "block";
+    document.getElementById("appSection").style.display = "none";
+    taskList.innerHTML = "";
+  }
+
+  // Auto-login if user already logged in
+  if (localStorage.getItem("loggedInUser")) {
+    showApp();
+  }
+
+  // ==============================
+  // Dark mode toggle
+  // ==============================
+  const toggle = document.getElementById("darkModeToggle");
   const body = document.body;
-  if (localStorage.getItem('theme') === 'dark') body.classList.add('dark-mode');
-  toggle.addEventListener('click', () => {
-    body.classList.toggle('dark-mode');
-    localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+  if (localStorage.getItem("theme") === "dark") body.classList.add("dark-mode");
+  toggle.addEventListener("click", () => {
+    body.classList.toggle("dark-mode");
+    localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
   });
 
-  // Switch to Base
+  // ==============================
+  // Wallet + Base Connection
+  // ==============================
   async function switchToBase() {
     if (!window.ethereum) {
       alert("Wallet not detected!");
@@ -94,7 +107,6 @@ document.addEventListener("DOMContentLoaded", updateUserCount);
     }
   }
 
-  // Connect wallet
   document.getElementById("connectWallet").addEventListener("click", async () => {
     const switched = await switchToBase();
     if (!switched) return;
@@ -108,11 +120,18 @@ document.addEventListener("DOMContentLoaded", updateUserCount);
       walletConnected = true;
       contract = new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signer);
       await loadTasksFromBase();
+
+      // Treat wallet connection as login
+      localStorage.setItem("loggedInUser", userAddress);
+      showApp();
     } catch (e) {
       alert("Wallet connection rejected.");
     }
   });
 
+  // ==============================
+  // Tasks (Local + Base)
+  // ==============================
   async function loadTasksFromBase() {
     if (!walletConnected || !contract) return;
     try {
@@ -128,15 +147,23 @@ document.addEventListener("DOMContentLoaded", updateUserCount);
     }
   }
 
+  function getUserTaskKey() {
+    const user = localStorage.getItem("loggedInUser");
+    if (!user) return null;
+    return "tasks_" + user;
+  }
+
   function saveTasks() {
     if (!walletConnected) {
-      localStorage.setItem("tasks", JSON.stringify(tasks));
+      const key = getUserTaskKey();
+      if (key) localStorage.setItem(key, JSON.stringify(tasks));
     }
   }
 
   function loadTasks() {
     if (!walletConnected) {
-      tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      const key = getUserTaskKey();
+      if (key) tasks = JSON.parse(localStorage.getItem(key)) || [];
       renderTasks();
     }
   }
@@ -248,28 +275,8 @@ document.addEventListener("DOMContentLoaded", updateUserCount);
     });
   }
 
-  // Load local tasks initially
+  // Initial load (local if no wallet)
   loadTasks();
 });
-document.addEventListener("DOMContentLoaded", async () => {
-  const fc = new Farcaster();
-  await fc.init();
-  console.log("✅ SDK initialized");
 
-  try {
-    const user = await fc.getUser();
-    console.log("👤 User:", user);
-  } catch (err) {
-    console.error("Error getting user:", err);
-  }
-});
-
-
-
-
-
-
-
-
-
-
+      
