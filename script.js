@@ -188,24 +188,25 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("script.js initialized");
 });
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// // Import the functions you need from the SDKs you need
+// import { initializeApp } from "firebase/app";
+// import { getAnalytics } from "firebase/analytics";
+// // TODO: Add SDKs for Firebase products that you want to use
+// // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyDPo4jZ54z0Q6VjFjDmoBC1hnplOC76Cq4",
-  authDomain: "my-to-do-app-21710.firebaseapp.com",
-  projectId: "my-to-do-app-21710",
-  storageBucket: "my-to-do-app-21710.firebasestorage.app",
-  messagingSenderId: "210529352739",
-  appId: "1:210529352739:web:b7b0e211e1f00e776ec596",
-  measurementId: "G-Q8633BD74Q"
-};
+// // Your web app's Firebase configuration
+// // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDPo4jZ54z0Q6VjFjDmoBC1hnplOC76Cq4",
+//   authDomain: "my-to-do-app-21710.firebaseapp.com",
+//   projectId: "my-to-do-app-21710",
+//   storageBucket: "my-to-do-app-21710.firebasestorage.app",
+//   messagingSenderId: "210529352739",
+//   appId: "1:210529352739:web:b7b0e211e1f00e776ec596",
+//   measurementId: "G-Q8633BD74Q"
+// };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// // Initialize Firebase
+// const app = initializeApp(firebaseConfig);
+// const analytics = getAnalytics(app);
+
